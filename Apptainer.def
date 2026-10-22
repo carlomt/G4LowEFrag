@@ -1,0 +1,27 @@
+Bootstrap: oras
+From: ghcr.io/g4med-test/geant4-alma9:{{ TAG }}
+
+%arguments
+    # Default values
+    TAG=v11.4.3
+    PROJECT_NAME=LowEFrag
+
+%labels
+    Author Carlo Mancini
+    Email mancinit@infn.it
+    Project {{ PROJECT_NAME }}
+    Description "Apptainer container for {{ PROJECT_NAME }}"
+
+%files
+    . /source
+
+%post
+    set -eu
+    cmake -S /source -B /tmp/g4med-build -DCMAKE_PREFIX_PATH=/opt/geant4 -DPROJECT_NAME_OVERRIDE="{{ PROJECT_NAME }}"
+    cmake --build /tmp/g4med-build --parallel "$(nproc)"
+    cmake --install /tmp/g4med-build
+    rm -rf /tmp/g4med-build
+
+%runscript
+    echo "Running {{ PROJECT_NAME }} simulation..."
+    /usr/local/bin/{{ PROJECT_NAME }} "$@"

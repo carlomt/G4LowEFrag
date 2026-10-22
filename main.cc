@@ -23,21 +23,15 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file Hadr03.cc
-/// \brief Main program of the hadronic/Hadr03 example
+/// \file main.cc
+/// \brief Main program of the LowEFrag test
 //
 //
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "G4Types.hh"
 
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#else
-#include "G4RunManager.hh"
-#endif
+#include "G4RunManagerFactory.hh"
 
 #include "G4UImanager.hh"
 #include "Randomize.hh"
@@ -45,7 +39,7 @@
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
 #include "ActionInitialization.hh"
-#include "SteppingVerbose.hh"
+// #include "SteppingVerbose.hh"
 
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
@@ -63,18 +57,9 @@ int main(int argc,char** argv) {
   //choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
 
-  // Construct the default run manager
-#ifdef G4MULTITHREADED
-  G4MTRunManager* runManager = new G4MTRunManager;
-  G4int nThreads = G4Threading::G4GetNumberOfCores();
-  if (argc==3) nThreads = G4UIcommand::ConvertToInt(argv[2]);
-  runManager->SetNumberOfThreads(nThreads);
-#else
-  //my Verbose output class
-  G4VSteppingVerbose::SetInstance(new SteppingVerbose);
-  G4RunManager* runManager = new G4RunManager;
-#endif
-
+  // Construct the run manager
+  auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+ 
   HistoManagerHelper::Instance();
   
   //set mandatory initialization classes
